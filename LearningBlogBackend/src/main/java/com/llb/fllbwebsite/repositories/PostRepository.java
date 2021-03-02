@@ -14,8 +14,9 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Override
     Optional<Post> findById(Long postId);
 
-    @Query("select p from Post p where lower(p.content) like %?1% or lower(p.title) like %?1% order by p.createdAt desc ")
+    Post findByTitle(String postTitle);
+
+    @Query("select p from Post p where lower(p.content) like %?1% or lower(p.title) like %?1% order by p.created_At desc ")
     List<Post> findPostByContentOrTitleIgnoreLetterCase(String searchText);
 
-//    Post findByTitle(String postTitle);
 }

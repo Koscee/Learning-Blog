@@ -1,11 +1,14 @@
 package com.llb.fllbwebsite.services;
 
 import com.llb.fllbwebsite.domain.Post;
+import com.llb.fllbwebsite.domain.User;
 import com.llb.fllbwebsite.exceptions.PostNotFoundException;
 import com.llb.fllbwebsite.exceptions.PostTitleException;
+import com.llb.fllbwebsite.exceptions.UserIdException;
 import com.llb.fllbwebsite.repositories.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 
 import java.util.List;
 import java.util.Optional;
@@ -13,17 +16,24 @@ import java.util.Optional;
 @Service
 public class PostService {
     private final PostRepository postRepository;
+    private final UserService userService;
 
     @Autowired
-    public PostService(PostRepository postRepository) {
+    public PostService(PostRepository postRepository, UserService userService) {
         this.postRepository = postRepository;
+        this.userService = userService;
     }
 
-    public Post saveOrUpdatePost(Post post){
+    public Post saveOrUpdatePost(Post post, String userEmail){
         try {
-             return postRepository.save(post);
+            User user = userService.findUserByEmail(userEmail);
+            post.setUser(user);
+            post.setAuthor(user.getUsername());
+            return postRepository.save(post);
+        }catch (UserIdException e){
+            throw  e;
         }catch (Exception e){
-            throw new PostTitleException("Post title '" + post.getTitle() + "' already exist");
+            throw new PostTitleException("Post title '" + post.getTitle() + "' has been used");
         }
     }
 
@@ -34,7 +44,7 @@ public class PostService {
     public Optional<Post> findPostById(Long postId){
         Optional<Post> post = postRepository.findById(postId);
         if (!post.isPresent()){
-            throw new PostNotFoundException("Post Id '" + postId + "' don't exist");
+            throw new PostNotFoundException("Post with Id '" + postId + "' don't exist");
         }
         return post;
     }
@@ -50,15 +60,19 @@ public class PostService {
     public void deletePostById(Long postId){
         Optional<Post> post = postRepository.findById(postId);
         if (!post.isPresent()){
-            throw new PostNotFoundException("Cannot delete, post id '" + postId + "' don't exist");
+            throw new PostNotFoundException("Cannot delete: post with id '" + postId + "' don't exist");
         }
         postRepository.deleteById(postId);
     }
 
 
-//    public Post findPostByTitle(String postTitle){
-//        return postRepository.findByTitle(postTitle);
-//    }
+    public Post findPostByTitle(String postTitle){
+        Post post = postRepository.findByTitle(postTitle);
+        if (post == null){
+            throw new PostTitleException("Post with title '" + postTitle + "' does not exist");
+        }
+        return post;
+    }
 
 //    public <T> void testCheck(T a, String mssg, Boolean b){
 //        if (b) System.out.println(mssg);

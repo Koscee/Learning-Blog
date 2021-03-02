@@ -7,13 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -31,12 +28,12 @@ public class PostController {
 
     // Create Post  [ @route: /api/posts  @access: private]
     @PostMapping("")
-    public ResponseEntity<?> createPost(@Valid @RequestBody Post post , BindingResult result){
+    public ResponseEntity<?> createPost(@Valid @RequestBody Post post, @RequestParam String userEmail, BindingResult result){
 
         ResponseEntity<?> errorMap = validationErrorService.MapValidationService(result);
         if (errorMap != null) return errorMap;
+        Post newPost = postService.saveOrUpdatePost(post, userEmail);
 
-        Post newPost = postService.saveOrUpdatePost(post);
         return new ResponseEntity<Post>(newPost, HttpStatus.CREATED);
     }
 
@@ -57,7 +54,7 @@ public class PostController {
     @DeleteMapping("/id/{postId}")
     public ResponseEntity<?> deletePostById(@PathVariable Long postId){
         postService.deletePostById(postId);
-        return new ResponseEntity<String>("Post with ID '" + postId + "' was deleted", HttpStatus.OK);
+        return new ResponseEntity<String>("Post with ID '" + postId + "' was deleted successfully", HttpStatus.OK);
     }
 
 
