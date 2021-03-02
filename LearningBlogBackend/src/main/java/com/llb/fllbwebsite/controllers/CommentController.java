@@ -26,7 +26,7 @@ public class CommentController {
 
     // Create Comment [ @route: /api/post/postTitle/comment  @access: private]
     @PostMapping("/{postTitle}/comment")
-    public ResponseEntity<?> createComment(@Valid @RequestBody Comment comment, @PathVariable String postTitle, @RequestParam String userEmail, BindingResult result){
+    public ResponseEntity<?> createComment(@PathVariable String postTitle, @RequestParam String userEmail, @Valid @RequestBody Comment comment, BindingResult result){
         ResponseEntity<?> errorMap = validationErrorService.MapValidationService(result);
         if (errorMap != null) return errorMap;
 
