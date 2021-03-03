@@ -43,14 +43,14 @@ public class PostController {
         return new ResponseEntity<Iterable<Post>>(postService.findAllPosts(), HttpStatus.OK);
     }
 
-    // Get Post by Id  [ @route: /api/posts/:id  @access: public / private]
+    // Get Post by Id  [ @route: /api/posts/id/:postId  @access: public / private]
     @GetMapping("/id/{postId}")
     public ResponseEntity<?> getPostById(@PathVariable Long postId){
         Optional<Post> post = postService.findPostById(postId);
         return new ResponseEntity<Optional<Post>>(post, HttpStatus.OK);
     }
 
-    // Delete Post by Id  [ @route: /api/posts/:id  @access: private]
+    // Delete Post by Id  [ @route: /api/posts/id/:postId  @access: private]
     @DeleteMapping("/id/{postId}")
     public ResponseEntity<?> deletePostById(@PathVariable Long postId){
         postService.deletePostById(postId);

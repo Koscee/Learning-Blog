@@ -32,4 +32,11 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
         UserExceptionResponse exceptionResponse = new UserExceptionResponse(ex.getMessage());
         return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler
+    public final ResponseEntity<Object> handleCategoryNameException(CategoryNameException ex, WebRequest request){
+
+        CategoryNameExceptionResponse exceptionResponse = new CategoryNameExceptionResponse(ex.getMessage());
+        return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
+    }
 }
