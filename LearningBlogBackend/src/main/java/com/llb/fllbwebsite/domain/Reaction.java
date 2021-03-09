@@ -8,55 +8,33 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
 import java.util.Date;
-import java.util.List;
 
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Post {
+public class Reaction {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Post title is required")
-    @Column(unique = true)
-    private String title;
+    private Boolean isLiked = false;
 
-    @NotBlank(message = "Category of post is required")
-    private String categoryName;
-
-    @NotBlank(message = "Post content is required")
-    private String content;
-
-    @NotBlank(message = "Post cover image is required")
-    private String coverImage;
-
-    private String author;
+    private String userName;
+    private String postName;
 
     //Many-to-One relationship with User
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore
     private User user;
 
-    //One-to-Many relationship with Comments
-    @OneToMany(mappedBy = "post", cascade = CascadeType.REFRESH, fetch = FetchType.LAZY, orphanRemoval = true)
-    private List<Comment> comments;
-
-    //One-to-Many relationship with Reaction (Likes)
-    @OneToMany(mappedBy = "post", cascade = CascadeType.REFRESH, fetch = FetchType.LAZY, orphanRemoval = true)
-    private List<Reaction> likes;
-
-    //Many-to-One relationship with Category
+    //Many-to-One relationship with Post
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore
-    private Category category;
-
-
-    //Avatar
+    private Post post;
 
     @Column(updatable = false)
     @JsonFormat(pattern = "yyyy-MM-dd")

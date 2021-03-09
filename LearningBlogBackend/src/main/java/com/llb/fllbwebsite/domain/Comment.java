@@ -36,7 +36,7 @@ public class Comment {
     @JsonIgnore
     private Post post;
 
-    //Like
+    //Likes for comment will be implemented in future version
 
     @Column(updatable = false)
     @JsonFormat(pattern = "yyyy-MM-dd")
