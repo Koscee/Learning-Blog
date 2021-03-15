@@ -4,6 +4,7 @@ import com.llb.fllbwebsite.domain.User;
 import com.llb.fllbwebsite.exceptions.UserIdException;
 import com.llb.fllbwebsite.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -12,14 +13,26 @@ import java.util.Optional;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Autowired
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.userRepository = userRepository;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
     public User saveOrUpdateUser(User user) {
        try {
+           user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+
+           // Username has to be unique (exception)
+
+           //password and confirmPassword must match
+
+           //confirmPassword shouldn't be persisted or shown
+           user.setConfirmPassword("");
+
+           //save
            return userRepository.save(user);
        }catch (Exception e){
            throw new UserIdException("User already exist");
@@ -31,9 +44,9 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public Optional<User> findUserById(Long userId) {
-        Optional<User> user = userRepository.findById(userId);
-        if (!user.isPresent()) {
+    public User findUserById(Long userId) {
+        User user = userRepository.getById(userId);
+        if (user == null) {
             throw new UserIdException("User with Id '" + userId + "' dose not exist");
         }
         return user;
@@ -48,10 +61,7 @@ public class UserService {
     }
 
     public void deleteUserById(Long userId) {
-        Optional<User> user = userRepository.findById(userId);
-        if (!user.isPresent()) {
-            throw new UserIdException("Cannot delete: User with id '" + userId+ "' does not exist");
-        }
-        userRepository.deleteById(userId);
+        User user = findUserById(userId);
+        userRepository.delete(user);
     }
 }

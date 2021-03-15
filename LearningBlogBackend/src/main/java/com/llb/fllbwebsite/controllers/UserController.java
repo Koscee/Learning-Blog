@@ -3,6 +3,7 @@ package com.llb.fllbwebsite.controllers;
 import com.llb.fllbwebsite.domain.User;
 import com.llb.fllbwebsite.services.UserService;
 import com.llb.fllbwebsite.services.ValidationErrorService;
+import com.llb.fllbwebsite.validator.UserValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,17 +19,22 @@ public class UserController {
 
     private final UserService userService;
     private final ValidationErrorService validationErrorService;
+    private final UserValidator userValidator;
 
 
     @Autowired
-    public UserController(UserService userService, ValidationErrorService validationErrorService) {
+    public UserController(UserService userService, ValidationErrorService validationErrorService, UserValidator userValidator) {
         this.userService = userService;
         this.validationErrorService = validationErrorService;
+        this.userValidator = userValidator;
     }
 
-    // Create User  [ @route: /api/users  @access: private]
-    @PostMapping("")
-    public ResponseEntity<?> createUser(@Valid @RequestBody User user, BindingResult result) {
+    // Create User  [ @route: /api/users/register  @access: private]
+    @PostMapping("/register")
+    public ResponseEntity<?> registerUser(@Valid @RequestBody User user, BindingResult result) {
+        // Validate password match
+        userValidator.validate(user, result);
+
         ResponseEntity<?> errorMap = validationErrorService.MapValidationService(result);
         if (errorMap != null) return errorMap;
         User newUser = userService.saveOrUpdateUser(user);
@@ -43,8 +49,8 @@ public class UserController {
 
     // Get User by Id  [ @route: /api/users/:id  @access: public / private]
     @GetMapping("/id/{userId}")
-    public ResponseEntity<Optional<User>> getUserById(@PathVariable Long userId) {
-        Optional<User> user = userService.findUserById(userId);
+    public ResponseEntity<User> getUserById(@PathVariable Long userId) {
+        User user = userService.findUserById(userId);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
