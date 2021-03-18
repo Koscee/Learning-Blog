@@ -37,6 +37,9 @@ public class User implements UserDetails {
     @NotBlank(message = "Last name is required")
     private String lastName;
 
+    @Transient
+    private String fullName;
+
     @Enumerated(value = EnumType.STRING)
     private Gender gender;
 
@@ -83,6 +86,11 @@ public class User implements UserDetails {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date updated_At;
 
+
+    @PostLoad
+    protected void onLoad(){
+        this.fullName = getFirstName() + " " + getLastName();
+    }
 
     @PrePersist
     public void onRegister(){

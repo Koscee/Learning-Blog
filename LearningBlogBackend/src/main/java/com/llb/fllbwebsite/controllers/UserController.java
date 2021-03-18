@@ -1,17 +1,25 @@
 package com.llb.fllbwebsite.controllers;
 
 import com.llb.fllbwebsite.domain.User;
+import com.llb.fllbwebsite.payload.JWTLoginSuccessResponse;
+import com.llb.fllbwebsite.payload.LoginRequest;
+import com.llb.fllbwebsite.security.JwtTokenProvider;
 import com.llb.fllbwebsite.services.UserService;
 import com.llb.fllbwebsite.services.ValidationErrorService;
 import com.llb.fllbwebsite.validator.UserValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.Optional;
+
+import static com.llb.fllbwebsite.security.SecurityConstants.TOKEN_PREFIX;
 
 @RestController
 @RequestMapping("/api/users")
@@ -20,13 +28,17 @@ public class UserController {
     private final UserService userService;
     private final ValidationErrorService validationErrorService;
     private final UserValidator userValidator;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final AuthenticationManager authenticationManager;
 
 
     @Autowired
-    public UserController(UserService userService, ValidationErrorService validationErrorService, UserValidator userValidator) {
+    public UserController(UserService userService, ValidationErrorService validationErrorService, UserValidator userValidator, JwtTokenProvider jwtTokenProvider, AuthenticationManager authenticationManager) {
         this.userService = userService;
         this.validationErrorService = validationErrorService;
         this.userValidator = userValidator;
+        this.jwtTokenProvider = jwtTokenProvider;
+        this.authenticationManager = authenticationManager;
     }
 
     // Create User  [ @route: /api/users/register  @access: private]
@@ -40,6 +52,26 @@ public class UserController {
         User newUser = userService.saveOrUpdateUser(user);
         return new ResponseEntity<User>(newUser, HttpStatus.CREATED);
     }
+
+    // User Login  [ @route: /api/users/login  @access: private]
+    @PostMapping("/login")
+    public  ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest, BindingResult result){
+        ResponseEntity<?> errorMap = validationErrorService.MapValidationService(result);
+        if (errorMap != null) return errorMap;
+
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        loginRequest.getUsername(),
+                        loginRequest.getPassword()
+                )
+        );
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        String jwt = TOKEN_PREFIX + jwtTokenProvider.generateToken(authentication);
+
+        return ResponseEntity.ok(new JWTLoginSuccessResponse(true, jwt));
+    }
+
 
     // Get all users  [ @route: /api/users/all  @access: public]
     @GetMapping("/all")
