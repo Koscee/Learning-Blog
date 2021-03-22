@@ -23,8 +23,8 @@ public class UserService {
     public User saveOrUpdateUser(User user) {
        try {
            user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-           // Username has to be unique (exception)
-           //password and confirmPassword must match (UserValidator)
+           // Username has to be unique (using the UserIdException)
+           //password and confirmPassword must match (using the UserValidator class)
 
            //confirmPassword shouldn't be persisted or shown
            user.setConfirmPassword("");
@@ -43,22 +43,30 @@ public class UserService {
 
     public User findUserById(Long userId) {
         User user = userRepository.getById(userId);
-        if (user == null) {
-            throw new UserIdException("User with Id '" + userId + "' dose not exist");
-        }
+        userDontExistMessage(user, "User with Id '" + userId + "' dose not exist");
         return user;
     }
 
     public User findUserByEmail(String userEmail){
         User user = userRepository.findByEmail(userEmail);
-        if (user == null) {
-            throw new UserIdException("User with email '" + userEmail + "' dose not exist");
-        }
+        userDontExistMessage(user, "User with email '" + userEmail + "' dose not exist");
+        return user;
+    }
+
+    public User findUserByUsername(String username){
+        User user = userRepository.findByUsername(username);
+        userDontExistMessage(user, "User with username '" + username + "' dose not exist");
         return user;
     }
 
     public void deleteUserById(Long userId) {
         User user = findUserById(userId);
         userRepository.delete(user);
+    }
+
+    public void userDontExistMessage(User user, String message){
+        if (user == null) {
+            throw new UserIdException(message);
+        }
     }
 }

@@ -2,8 +2,6 @@ package com.llb.fllbwebsite.security;
 
 import com.llb.fllbwebsite.domain.User;
 import com.llb.fllbwebsite.services.CustomUserDetailsService;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;

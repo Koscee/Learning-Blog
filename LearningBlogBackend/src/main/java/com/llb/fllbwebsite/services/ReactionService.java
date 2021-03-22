@@ -26,10 +26,10 @@ public class ReactionService {
         this.userService = userService;
     }
 
-    public Reaction saveLike(String postTitle, String userEmail, Reaction reaction){
+    public Reaction saveLike(String postTitle, String username, Reaction reaction){
         try {
             //check if user exist
-            User user = userService.findUserByEmail(userEmail);
+            User user = userService.findUserByUsername(username);
 
             //find the post
             Post post = postService.findPostByTitle(postTitle);
@@ -54,10 +54,10 @@ public class ReactionService {
         }
     }
 
-    public void deleteLike(String postTitle, String userEmail){
+    public void deleteLike(String postTitle, String username){
         try {
             //check if user exist
-            User user = userService.findUserByEmail(userEmail);
+            User user = userService.findUserByUsername(username);
             //find the post
             Post post = postService.findPostByTitle(postTitle);
             //find user's reaction

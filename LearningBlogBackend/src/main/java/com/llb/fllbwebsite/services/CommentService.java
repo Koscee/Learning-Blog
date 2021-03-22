@@ -23,10 +23,10 @@ public class CommentService {
         this.postService = postService;
     }
 
-    public Comment saveOrUpdateComment(Comment comment, String postTitle, String userEmail){
+    public Comment saveOrUpdateComment(Comment comment, String postTitle, String username){
         try {
             //check if user exist
-            User user = userService.findUserByEmail(userEmail);
+            User user = userService.findUserByUsername(username);
             //find the post
             Post post = postService.findPostByTitle(postTitle);
             //set relationship attributes
