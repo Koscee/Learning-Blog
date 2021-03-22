@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 
 @Service
 public class UserService {
@@ -24,10 +23,8 @@ public class UserService {
     public User saveOrUpdateUser(User user) {
        try {
            user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-
            // Username has to be unique (exception)
-
-           //password and confirmPassword must match
+           //password and confirmPassword must match (UserValidator)
 
            //confirmPassword shouldn't be persisted or shown
            user.setConfirmPassword("");
