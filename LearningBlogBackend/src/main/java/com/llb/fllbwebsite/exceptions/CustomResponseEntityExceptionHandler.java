@@ -46,4 +46,11 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
         ReactionNotFoundExceptionResponse exceptionResponse = new ReactionNotFoundExceptionResponse(ex.getMessage());
         return  new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler
+    public final ResponseEntity<Object> handleRoleNotFoundException(RoleNotFoundException ex, WebRequest request){
+
+        RoleNotFoundExceptionResponse exceptionResponse = new RoleNotFoundExceptionResponse(ex.getMessage());
+        return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
+    }
 }

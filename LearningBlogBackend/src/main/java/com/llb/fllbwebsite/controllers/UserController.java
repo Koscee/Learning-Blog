@@ -3,6 +3,7 @@ package com.llb.fllbwebsite.controllers;
 import com.llb.fllbwebsite.domain.User;
 import com.llb.fllbwebsite.payload.JWTLoginSuccessResponse;
 import com.llb.fllbwebsite.payload.LoginRequest;
+import com.llb.fllbwebsite.payload.UserUpdateRequest;
 import com.llb.fllbwebsite.security.JwtTokenProvider;
 import com.llb.fllbwebsite.services.UserService;
 import com.llb.fllbwebsite.services.ValidationErrorService;
@@ -18,6 +19,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+
+import java.security.Principal;
 
 import static com.llb.fllbwebsite.security.SecurityConstants.TOKEN_PREFIX;
 
@@ -49,9 +52,10 @@ public class UserController {
 
         ResponseEntity<?> errorMap = validationErrorService.MapValidationService(result);
         if (errorMap != null) return errorMap;
-        User newUser = userService.saveOrUpdateUser(user);
+        User newUser = userService.save(user);
         return new ResponseEntity<User>(newUser, HttpStatus.CREATED);
     }
+
 
     // User Login  [ @route: /api/users/login  @access: private]
     @PostMapping("/login")
@@ -70,6 +74,18 @@ public class UserController {
         String jwt = TOKEN_PREFIX + jwtTokenProvider.generateToken(authentication);
 
         return ResponseEntity.ok(new JWTLoginSuccessResponse(true, jwt));
+    }
+
+
+    // Update User  [ @route: /api/users/update/{id}  @access: private]
+    @PatchMapping("/update/{userId}")
+    public ResponseEntity<?> updateUser(@Valid @RequestBody UserUpdateRequest updateRequest, BindingResult result,
+                                        @PathVariable Long userId, Principal principal){
+        ResponseEntity<?> errorMap = validationErrorService.MapValidationService(result);
+        if (errorMap != null) return errorMap;
+
+        User updatedUser = userService.updateUser(updateRequest, userId, principal.getName());
+        return new ResponseEntity<>(updatedUser, HttpStatus.OK);
     }
 
 
