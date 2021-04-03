@@ -9,16 +9,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Entity
 @Data
@@ -65,6 +63,9 @@ public class User implements UserDetails {
 
     private String avatarImg;
 
+    @Transient
+    private String roleName = "";
+
     //One-to-Many relationship with Post
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Post> posts = new ArrayList<>();
@@ -77,7 +78,10 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Reaction> likes = new ArrayList<>();
 
-    //Role
+    //Many-to-One relationship with Role
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
+    private Role role;
 
     @Column(updatable = false)
     @JsonFormat(pattern = "yyyy-MM-dd")
@@ -90,6 +94,7 @@ public class User implements UserDetails {
     @PostLoad
     protected void onLoad(){
         this.fullName = getFirstName() + " " + getLastName();
+        this.roleName = this.role.getRoleName();
     }
 
     @PrePersist
@@ -102,13 +107,25 @@ public class User implements UserDetails {
         this.updated_At = new Date();
     }
 
+    @PostPersist
+    protected void afterRegister(){
+        this.onLoad();
+    }
+
+    @PostUpdate
+    protected void afterUpdate(){
+        this.onLoad();
+    }
+
+
     /*
     UserDetails interface methods
      */
 
     @Override
+    //@JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + this.getRole().getRoleName()));
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.llb.fllbwebsite.security;
 
+
 import com.llb.fllbwebsite.services.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -15,8 +16,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import static com.llb.fllbwebsite.security.SecurityConstants.H2_URL;
-import static com.llb.fllbwebsite.security.SecurityConstants.SIGN_UP_URLS;
+import static com.llb.fllbwebsite.security.SecurityConstants.*;
 
 @Configuration
 @EnableWebSecurity
@@ -58,6 +58,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .headers().frameOptions().sameOrigin()  //To enable H2 Database
                 .and()
                 .authorizeRequests()
+                .antMatchers("/api/users/all").hasRole(SUPER_ADMIN_ROLE)
                 .antMatchers(
                         "/",
                         "/favicon.ico",
