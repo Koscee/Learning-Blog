@@ -6,8 +6,6 @@ import com.llb.fllbwebsite.repositories.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 @Service
 public class CategoryService {
     private final CategoryRepository categoryRepository;
@@ -15,6 +13,12 @@ public class CategoryService {
     @Autowired
     public CategoryService(CategoryRepository categoryRepository) {
         this.categoryRepository = categoryRepository;
+    }
+
+    public void categoryDontExistMessage(Category category, String message){
+        if (category == null) {
+            throw new CategoryNameException(message);
+        }
     }
 
     public Category saveOrUpdateCategory(Category category){
@@ -25,19 +29,15 @@ public class CategoryService {
         }
     }
 
-    public Optional<Category> findCategoryById(Long categoryId){
-        Optional<Category> category = categoryRepository.findById(categoryId);
-        if (!category.isPresent()){
-            throw new CategoryNameException("Category with Id '" + categoryId + "' don't exist");
-        }
+    public Category findCategoryById(Long categoryId){
+        Category category = categoryRepository.getById(categoryId);
+        categoryDontExistMessage(category, "Category with Id '" + categoryId + "' don't exist");
         return category;
     }
 
     public Category findCategoryByName(String categoryName){
         Category category = categoryRepository.findByCategoryName(categoryName);
-        if (category == null){
-            throw new CategoryNameException("Category with name '" + categoryName + "' don't exist");
-        }
+        categoryDontExistMessage(category, "Category with name '" + categoryName + "' don't exist");
         return category;
     }
 
@@ -46,10 +46,7 @@ public class CategoryService {
     }
 
     public void deleteCategoryById(Long categoryId){
-        Optional<Category> category = categoryRepository.findById(categoryId);
-        if (!category.isPresent()){
-            throw new CategoryNameException("Cannot delete! Category with id '" + categoryId + "' don't exist");
-        }
-        categoryRepository.deleteById(categoryId);
+        Category category = findCategoryById(categoryId);
+        categoryRepository.delete(category);
     }
 }

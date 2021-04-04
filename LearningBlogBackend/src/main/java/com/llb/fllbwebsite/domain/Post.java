@@ -62,10 +62,10 @@ public class Post {
 
     @Column(updatable = false)
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private Date created_At;
+    private Date createdAt;
 
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private Date updated_At;
+    private Date updatedAt;
 
     @PostLoad
     protected void onLoad(){
@@ -74,11 +74,11 @@ public class Post {
 
     @PrePersist
     protected void onCreate(){
-        this.created_At = new Date();
+        this.createdAt = new Date();
     }
 
     @PreUpdate
     protected void onUpdate(){
-        this.updated_At = new Date();
+        this.updatedAt = new Date();
     }
 }

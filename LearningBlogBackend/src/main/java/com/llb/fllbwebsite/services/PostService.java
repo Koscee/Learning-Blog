@@ -9,11 +9,13 @@ import com.llb.fllbwebsite.exceptions.PostTitleException;
 import com.llb.fllbwebsite.exceptions.UserIdException;
 import com.llb.fllbwebsite.repositories.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 
 import java.util.List;
-import java.util.Optional;
+
+import static com.llb.fllbwebsite.security.SecurityConstants.SUPER_ADMIN_ROLE;
 
 @Service
 public class PostService {
@@ -26,6 +28,12 @@ public class PostService {
         this.postRepository = postRepository;
         this.userService = userService;
         this.categoryService = categoryService;
+    }
+
+    public void postDontExistMessage(Post post, String message){
+        if (post == null) {
+            throw new PostNotFoundException(message);
+        }
     }
 
     public Post saveOrUpdatePost(Post post, String username){
@@ -48,15 +56,18 @@ public class PostService {
     }
 
     public Iterable<Post> findAllPosts(){
-        return postRepository.findAll();
+        return postRepository.findAll(Sort.by(Sort.Direction.DESC, "createdAt"));
     }
 
-    public Optional<Post> findPostById(Long postId){
-        Optional<Post> post = postRepository.findById(postId);
-        if (!post.isPresent()){
-            throw new PostNotFoundException("Post with Id '" + postId + "' don't exist");
-        }
+    public Post findPostById(Long postId){
+        Post post = postRepository.getById(postId);
+        postDontExistMessage(post, "Post with Id '" + postId + "' don't exist");
         return post;
+    }
+
+    public Iterable<Post> findAllPostsByUser(String username){
+        User user = userService.findUserByUsername(username);
+        return postRepository.findAllByUserOrderByIdDesc(user);
     }
 
     public List<Post> findPostByContentOrTitleIgnoreLetterCase(String searchText){
@@ -67,22 +78,25 @@ public class PostService {
         return posts;
     }
 
-    public void deletePostById(Long postId){
-        Optional<Post> post = postRepository.findById(postId);
-        if (!post.isPresent()){
-            throw new PostNotFoundException("Cannot delete! Post with id '" + postId + "' don't exist");
+    public void deletePostById(Long postId, String username){
+        User authenticatedUser = userService.findUserByUsername(username);
+        String authenticatedUserRole = authenticatedUser.getRole().getRoleName();
+        Post post = findPostById(postId);
+        User postOwner = post.getUser();
+
+        if (!postOwner.equals(authenticatedUser) && !authenticatedUserRole.equals(SUPER_ADMIN_ROLE)){
+            throw new UserIdException("You are not allowed to delete this post");
         }
-        postRepository.deleteById(postId);
+        postRepository.delete(post);
     }
 
 
     public Post findPostByTitle(String postTitle){
         Post post = postRepository.findByTitle(postTitle);
-        if (post == null){
-            throw new PostTitleException("Post with title '" + postTitle + "' does not exist");
-        }
+        postDontExistMessage(post, "Post with title '" + postTitle + "' does not exist");
         return post;
     }
+
 
 //    public <T> void testCheck(T a, String mssg, Boolean b){
 //        if (b) System.out.println(mssg);

@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.security.Principal;
 import java.util.List;
-import java.util.Optional;
+
 
 @RestController
 @RequestMapping("/api/posts")
@@ -44,17 +44,23 @@ public class PostController {
         return new ResponseEntity<Iterable<Post>>(postService.findAllPosts(), HttpStatus.OK);
     }
 
+    // Get all Posts of a User  [ @route: /api/posts/all/user  @access: public]
+    @GetMapping("/all/user")
+    public ResponseEntity<Iterable<Post>> getAllPostsByUser(Principal principal){
+        return new ResponseEntity<Iterable<Post>>(postService.findAllPostsByUser(principal.getName()), HttpStatus.OK);
+    }
+
     // Get Post by Id  [ @route: /api/posts/id/:postId  @access: public / private]
     @GetMapping("/id/{postId}")
-    public ResponseEntity<?> getPostById(@PathVariable Long postId){
-        Optional<Post> post = postService.findPostById(postId);
-        return new ResponseEntity<Optional<Post>>(post, HttpStatus.OK);
+    public ResponseEntity<Post> getPostById(@PathVariable Long postId){
+        Post post = postService.findPostById(postId);
+        return new ResponseEntity<Post>(post, HttpStatus.OK);
     }
 
     // Delete Post by Id  [ @route: /api/posts/id/:postId  @access: private]
     @DeleteMapping("/id/{postId}")
-    public ResponseEntity<?> deletePostById(@PathVariable Long postId){
-        postService.deletePostById(postId);
+    public ResponseEntity<?> deletePostById(@PathVariable Long postId, Principal principal){
+        postService.deletePostById(postId, principal.getName());
         return new ResponseEntity<String>("Post with ID '" + postId + "' was deleted successfully", HttpStatus.OK);
     }
 
