@@ -1,6 +1,7 @@
 package com.llb.fllbwebsite.controllers;
 
 import com.llb.fllbwebsite.domain.Post;
+import com.llb.fllbwebsite.domain.PostDto;
 import com.llb.fllbwebsite.services.PostService;
 import com.llb.fllbwebsite.services.ValidationErrorService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/posts")
+@CrossOrigin
 public class PostController {
     private final PostService postService;
     private final ValidationErrorService validationErrorService;
@@ -44,6 +46,12 @@ public class PostController {
     @GetMapping("/all")
     public ResponseEntity<Iterable<Post>> getAllPosts(){
         return new ResponseEntity<Iterable<Post>>(postService.findAllPosts(), HttpStatus.OK);
+    }
+
+    // Get all Posts info without including their content  [ @route: /api/posts/all-filtered  @access: public]
+    @GetMapping("/all-filtered")
+    public ResponseEntity<List<PostDto>> getAllFilteredPosts(){
+        return new ResponseEntity<>(postService.getAllPostsAndFilterPostContents(), HttpStatus.OK);
     }
 
     // Get Post by Id  [ @route: /api/posts/:id  @access: public / private]

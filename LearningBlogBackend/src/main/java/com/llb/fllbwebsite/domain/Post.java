@@ -25,11 +25,18 @@ public class Post {
     @Column(unique = true)
     private String title;
 
+    @NotBlank(message = "Post description is required")
+    private String description;
+
     @NotBlank(message = "Post content is required")
+    @Lob
     private String content;
 
     @NotBlank(message = "Post cover image is required")
     private String coverImage;
+
+    @NotBlank(message = "Post category name is required")
+    private String categoryName;
 
 
     //UserId
@@ -53,4 +60,5 @@ public class Post {
     protected void onUpdate(){
         this.updatedAt = new Date();
     }
+
 }

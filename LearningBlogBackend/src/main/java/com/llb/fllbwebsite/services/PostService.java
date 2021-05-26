@@ -1,6 +1,7 @@
 package com.llb.fllbwebsite.services;
 
 import com.llb.fllbwebsite.domain.Post;
+import com.llb.fllbwebsite.domain.PostDto;
 import com.llb.fllbwebsite.exceptions.PostNotFoundException;
 import com.llb.fllbwebsite.exceptions.PostTitleException;
 import com.llb.fllbwebsite.repositories.PostRepository;
@@ -29,6 +30,10 @@ public class PostService {
 
     public Iterable<Post> findAllPosts(){
         return postRepository.findAll();
+    }
+
+    public List<PostDto> getAllPostsAndFilterPostContents(){
+        return postRepository.getAll();
     }
 
     public Optional<Post> findPostById(Long postId){
