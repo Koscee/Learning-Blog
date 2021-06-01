@@ -26,8 +26,12 @@ public class UserUpdateRequest {
     @NotBlank(message = "Field cannot be blank")
     private String email;
 
+//    @NotBlank(message = "Password field is required")
+//    @Size(min = 8, message = "Password must be more than 8 characters")
+//    private String password;
+
     @NotBlank(message = "Field cannot be blank")
-    @Size(min = 11, max = 11, message = "Invalid mobile number")
+    @Size(min = 13, max = 18, message = "Invalid mobile number")
     private String phoneNumber;
 
     private String avatarImg;

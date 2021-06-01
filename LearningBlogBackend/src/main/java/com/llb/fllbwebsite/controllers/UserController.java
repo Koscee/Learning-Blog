@@ -1,6 +1,8 @@
 package com.llb.fllbwebsite.controllers;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.llb.fllbwebsite.domain.User;
+import com.llb.fllbwebsite.domain.View;
 import com.llb.fllbwebsite.payload.JWTLoginSuccessResponse;
 import com.llb.fllbwebsite.payload.LoginRequest;
 import com.llb.fllbwebsite.payload.UserUpdateRequest;
@@ -90,6 +92,7 @@ public class UserController {
 
 
     // Get all users  [ @route: /api/users/all  @access: public]
+    @JsonView(View.Summary.class)
     @GetMapping("/all")
     public ResponseEntity<Iterable<User>> getAllUsers(){
         return new ResponseEntity<>(userService.findAllUsers(), HttpStatus.OK);

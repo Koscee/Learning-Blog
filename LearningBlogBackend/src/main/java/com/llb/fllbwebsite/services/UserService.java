@@ -54,7 +54,7 @@ public class UserService {
 
         Long userUpdateRequestId = userUpdateRequest.getId();
         User authenticatedUser = findUserByUsername(username);
-        String userRole = authenticatedUser.getRole().getRoleName();
+        String userRole = authenticatedUser.getRole().getName();
         User storedUser = findUserById(userId);
 
         if (!userUpdateRequestId.equals(userId)){
@@ -118,6 +118,7 @@ public class UserService {
         oldInfo.setPhoneNumber(updatedInfo.getPhoneNumber());
         oldInfo.setAvatarImg(updatedInfo.getAvatarImg());
         oldInfo.setRole(roleService.findRoleByName(updatedInfo.getRoleName()));
+//        oldInfo.setPassword(bCryptPasswordEncoder.encode(updatedInfo.getPassword())); // if any bug on passwrd update check here
     }
 
 

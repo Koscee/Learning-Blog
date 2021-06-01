@@ -17,7 +17,7 @@ public class RoleService {
     }
 
     public Role findRoleByName(String roleName){
-        Role role = roleRepository.findByRoleName(roleName);
+        Role role = roleRepository.findByName(roleName);
         if (role == null) throw new RoleNotFoundException("Role assigned don't exist");
         return role;
     }

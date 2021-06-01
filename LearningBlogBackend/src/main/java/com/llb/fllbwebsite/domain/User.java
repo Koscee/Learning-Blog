@@ -3,6 +3,7 @@ package com.llb.fllbwebsite.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
 import com.llb.fllbwebsite.enums.Gender;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,27 +28,34 @@ public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonView(View.Summary.class)
     private Long id;
 
     @NotBlank(message = "First name is required")
+    @JsonView(View.Summary.class)
     private String firstName;
 
-    @NotBlank(message = "Last name is required")
+//    @NotBlank(message = "Last name is required")
+    @JsonView(View.Summary.class)
     private String lastName;
 
     @Transient
+    @JsonView(View.Summary.class)
     private String fullName;
 
     @Enumerated(value = EnumType.STRING)
+    @JsonView(View.Summary.class)
     private Gender gender;
 
     @NotBlank(message = "Username is required")
     @Column(unique = true)
+    @JsonView(View.Summary.class)
     private String username;
 
     @Email(message = "Please input a valid email address")
     @NotBlank(message = "Email address is required")
     @Column(unique = true)
+    @JsonView(View.Summary.class)
     private String email;
 
     @NotBlank(message = "Password field is required")
@@ -58,16 +66,20 @@ public class User implements UserDetails {
     private String confirmPassword;
 
     @NotBlank(message = "Phone number is required")
-    @Size(min = 11, max = 11, message = "Invalid mobile number")
+    @Size(min = 13, max = 18, message = "Invalid mobile number")
+    @JsonView(View.Summary.class)
     private String phoneNumber;
 
+    @JsonView(View.Summary.class)
     private String avatarImg;
 
     @Transient
+    @JsonView(View.Summary.class)
     private String roleName = "";
 
     //One-to-Many relationship with Post
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Post> posts = new ArrayList<>();
 
     //One-to-Many relationship with Comments
@@ -85,16 +97,18 @@ public class User implements UserDetails {
 
     @Column(updatable = false)
     @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonView(View.Summary.class)
     private Date registered_At;
 
     @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonView(View.Summary.class)
     private Date updated_At;
 
 
     @PostLoad
     protected void onLoad(){
         this.fullName = getFirstName() + " " + getLastName();
-        this.roleName = this.role.getRoleName();
+        this.roleName = this.role.getName();
     }
 
     @PrePersist
@@ -123,9 +137,9 @@ public class User implements UserDetails {
      */
 
     @Override
-    //@JsonIgnore
+    @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + this.getRole().getRoleName()));
+        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + this.getRole().getName()));
     }
 
     @Override

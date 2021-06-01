@@ -62,7 +62,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.DELETE, DELETE_USER_URL).hasRole(SUPER_ADMIN_ROLE)
                 .antMatchers(USERS_LIST_URL).hasRole(SUPER_ADMIN_ROLE)
                 .antMatchers(COMMENTS_AND_LIKES_LIST_URLS).hasRole(SUPER_ADMIN_ROLE)
-                .antMatchers(CATEGORY_LIST_URL).hasRole(SUPER_ADMIN_ROLE)
+//                .antMatchers(CATEGORY_LIST_URL).hasRole(SUPER_ADMIN_ROLE)
                 .antMatchers(HttpMethod.POST, CREATE_CATEGORY_URL).hasRole(SUPER_ADMIN_ROLE)
                 .antMatchers(HttpMethod.DELETE, DELETE_CATEGORY_URL).hasRole(SUPER_ADMIN_ROLE)
                 .antMatchers(ROLE_URLS).hasRole(SUPER_ADMIN_ROLE)

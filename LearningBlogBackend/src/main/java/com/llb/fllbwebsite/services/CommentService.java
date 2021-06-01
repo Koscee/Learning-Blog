@@ -33,6 +33,7 @@ public class CommentService {
             comment.setPost(post);
             comment.setUser(user);
             comment.setUserName(user.getUsername());
+            comment.setUserAvatar(user.getAvatarImg());
             comment.setPostName(post.getTitle());
             //save into or update the database
             return commentRepository.save(comment);

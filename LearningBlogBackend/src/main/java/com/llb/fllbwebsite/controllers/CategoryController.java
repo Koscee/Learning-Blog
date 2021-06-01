@@ -1,6 +1,8 @@
 package com.llb.fllbwebsite.controllers;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.llb.fllbwebsite.domain.Category;
+import com.llb.fllbwebsite.domain.View;
 import com.llb.fllbwebsite.services.CategoryService;
 import com.llb.fllbwebsite.services.ValidationErrorService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,12 +38,14 @@ public class CategoryController {
     }
 
     // Get all Categories  [ @route: /api/categories/all  @access: public]
+    @JsonView(View.Summary.class)
     @GetMapping("/all")
     public ResponseEntity<Iterable<Category>> getAllCategories(){
         return new ResponseEntity<>(categoryService.findAllCategory(), HttpStatus.OK);
     }
 
     // Get Category by Id  [ @route: /api/categories/id/:categoryId  @access: public / private]
+    @JsonView(View.Summary.class)
     @GetMapping("/id/{categoryId}")
     public ResponseEntity<Category> getCategoryById(@PathVariable Long categoryId){
         Category category = categoryService.findCategoryById(categoryId);
@@ -49,6 +53,7 @@ public class CategoryController {
     }
 
     // Get Category by Name  [ @route: /api/categories/name/:categoryName  @access: public / private]
+    @JsonView(View.Summary.class)
     @GetMapping("/name/{categoryName}")
     public ResponseEntity<Category> getCategoryByName(@PathVariable String categoryName){
         Category category = categoryService.findCategoryByName(categoryName);

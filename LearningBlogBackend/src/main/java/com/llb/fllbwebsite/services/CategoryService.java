@@ -36,7 +36,7 @@ public class CategoryService {
     }
 
     public Category findCategoryByName(String categoryName){
-        Category category = categoryRepository.findByCategoryName(categoryName);
+        Category category = categoryRepository.findByName(categoryName);
         categoryDontExistMessage(category, "Category with name '" + categoryName + "' don't exist");
         return category;
     }

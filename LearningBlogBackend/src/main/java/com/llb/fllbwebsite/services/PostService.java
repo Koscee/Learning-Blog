@@ -3,6 +3,7 @@ package com.llb.fllbwebsite.services;
 import com.llb.fllbwebsite.domain.Category;
 import com.llb.fllbwebsite.domain.Post;
 import com.llb.fllbwebsite.domain.User;
+import com.llb.fllbwebsite.dto.PostDto;
 import com.llb.fllbwebsite.exceptions.CategoryNameException;
 import com.llb.fllbwebsite.exceptions.PostNotFoundException;
 import com.llb.fllbwebsite.exceptions.PostTitleException;
@@ -42,6 +43,7 @@ public class PostService {
             User user = userService.findUserByUsername(username);
             post.setUser(user);
             post.setAuthor(user.getUsername());
+            post.setAuthorAvatar(user.getAvatarImg());
 
             //find category and set relationship with post
             Category category = categoryService.findCategoryByName(post.getCategoryName());
@@ -59,6 +61,10 @@ public class PostService {
         return postRepository.findAll(Sort.by(Sort.Direction.DESC, "createdAt"));
     }
 
+    public Iterable<PostDto> getAllPostsAndFilterPostContents(){
+        return postRepository.getAll(Sort.by(Sort.Direction.DESC, "createdAt"));
+    }
+
     public Post findPostById(Long postId){
         Post post = postRepository.getById(postId);
         postDontExistMessage(post, "Post with Id '" + postId + "' don't exist");
@@ -68,6 +74,10 @@ public class PostService {
     public Iterable<Post> findAllPostsByUser(String username){
         User user = userService.findUserByUsername(username);
         return postRepository.findAllByUserOrderByIdDesc(user);
+    }
+
+    public Iterable<Post> findTop3RelatedPostByCategoryName(Long postId, String categoryName){
+        return postRepository.findTop3ByIdNotAndCategoryNameOrderByCreatedAtDesc(postId, categoryName);
     }
 
     public List<Post> findPostByContentOrTitleIgnoreLetterCase(String searchText){
@@ -80,7 +90,7 @@ public class PostService {
 
     public void deletePostById(Long postId, String username){
         User authenticatedUser = userService.findUserByUsername(username);
-        String authenticatedUserRole = authenticatedUser.getRole().getRoleName();
+        String authenticatedUserRole = authenticatedUser.getRole().getName();
         Post post = findPostById(postId);
         User postOwner = post.getUser();
 

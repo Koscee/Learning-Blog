@@ -1,6 +1,9 @@
 package com.llb.fllbwebsite.controllers;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.llb.fllbwebsite.domain.Post;
+import com.llb.fllbwebsite.domain.View;
+import com.llb.fllbwebsite.dto.PostDto;
 import com.llb.fllbwebsite.services.PostService;
 import com.llb.fllbwebsite.services.ValidationErrorService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,12 +42,20 @@ public class PostController {
     }
 
     // Get all Posts  [ @route: /api/posts/all  @access: public]
+    @JsonView(View.Summary.class)
     @GetMapping("/all")
     public ResponseEntity<Iterable<Post>> getAllPosts(){
         return new ResponseEntity<Iterable<Post>>(postService.findAllPosts(), HttpStatus.OK);
     }
 
+    // Get all Posts info without including their content  [ @route: /api/posts/all-filtered @access: public]
+    @GetMapping("/all-filtered")
+    public ResponseEntity<Iterable<PostDto>> getAllFilteredPosts(){
+        return new ResponseEntity<Iterable<PostDto>>(postService.getAllPostsAndFilterPostContents(), HttpStatus.OK);
+    }
+
     // Get all Posts of a User  [ @route: /api/posts/all/user  @access: public]
+    @JsonView(View.Summary.class)
     @GetMapping("/all/user")
     public ResponseEntity<Iterable<Post>> getAllPostsByUser(Principal principal){
         return new ResponseEntity<Iterable<Post>>(postService.findAllPostsByUser(principal.getName()), HttpStatus.OK);
@@ -57,6 +68,14 @@ public class PostController {
         return new ResponseEntity<Post>(post, HttpStatus.OK);
     }
 
+    // Get Posts by categoryName  [ @route: /api/posts/all/{postId}/{categoryName}  @access: public]
+    @JsonView(View.Summary.class)
+    @GetMapping("/all/{postId}/{categoryName}")
+    public ResponseEntity<?> getTop3RelatedPosts(@PathVariable Long postId, @PathVariable String categoryName){
+        Iterable<Post> posts = postService.findTop3RelatedPostByCategoryName(postId, categoryName);
+        return new ResponseEntity<>(posts, HttpStatus.OK);
+    }
+
     // Delete Post by Id  [ @route: /api/posts/id/:postId  @access: private]
     @DeleteMapping("/id/{postId}")
     public ResponseEntity<?> deletePostById(@PathVariable Long postId, Principal principal){
@@ -66,6 +85,7 @@ public class PostController {
 
 
     // Get Post by title or content  [ @route: /api/posts/search?searchText=value  @access: public / private]
+    @JsonView(View.Summary.class)
     @GetMapping("/search")
     public ResponseEntity<?> searchPostByTitleOrContent(@RequestParam(value = "searchText") String searchText){
         List<Post> foundPosts = postService.findPostByContentOrTitleIgnoreLetterCase(searchText);
